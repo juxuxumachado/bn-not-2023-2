@@ -21,3 +21,8 @@ PROJETO BACK-END
 #Instalando o Primsma com conector para MongoDB
 * `npx prisma init --datasource-provider mongodb`
 * Instale os pacotes de extensao do prisma
+
+
+# Gerando o cliente do Prisma
+*`npx prisma generate`
+*Precisa ser executado ** toda vez** que o arquivo `schema.prima` for alterado
