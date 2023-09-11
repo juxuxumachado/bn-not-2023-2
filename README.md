@@ -23,6 +23,8 @@ PROJETO BACK-END
 * Instale os pacotes de extensao do prisma
 
 
+#Adicionando o Prisma Client ao projeto
+`npm install @prisma/client`
 # Gerando o cliente do Prisma
 *`npx prisma generate`
 *Precisa ser executado ** toda vez** que o arquivo `schema.prima` for alterado
