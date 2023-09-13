@@ -19,4 +19,89 @@ controller.create = async  function(req, res){
     }
 }
 
+controller.retrieveAll = async function(req, res){
+    try {
+        //Manda buscar os dados no servidor
+        // Traz ordenado por nome, depois por n ivel
+        const result = await prisma.curso.findMany({
+            orderBy:[
+                {nome:'asc'}, // ordem ascendete
+                {nivel: 'asc'} //ordem ascendete
+            ]
+        })
+        //http 200: ok
+        res.send(result)
+
+    }
+    catch(error){
+        //deu errado: exibe o erro no console do back-end
+        console.error(error)
+        //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
+        res.status(500).send(error)
+        }
+}
+
+controller.retrieveOne = async function(req, res){
+    try{
+        const result = await prisma.curso.findUnique({
+            where: {id: req.params.id}
+        })
+
+        // Encontrou ~> retorna HTTP 200:OK
+        if(result) res.send(result)
+
+        //Não encontrou ~> retorna HTTP 404: NOT fOUND
+        else res.status(404).end()
+    }
+    catch(error){
+        //deu errado: exibe o erro no console do back-end
+        console.error(error)
+        //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
+        res.status(500).send(error)
+        }
+    
+}
+
+
+controller.update = async function(req, res){
+    try{
+        const result = await prisma.curso.update({
+            where: {id: req.params.id},
+            data: req.body
+        })
+
+        //Encontrou e atualizou ~> retorna http 204: ok
+        if(result) res.status(204).end()
+
+        //Não encontrou (e não atualizou) ~> retonna HTTP 404: NOt Found
+        else res.status(404).end()
+    }
+    catch(error){
+        //deu errado: exibe o erro no console do back-end
+        console.error(error)
+        //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
+        res.status(500).send(error)
+        }
+}
+
+
+controller.delete = async function(req, res){
+    try{
+        const result = await prisma.curso.delete({
+            where :{id: req.params.id}
+        })
+        //Encontrou e atualizou ~> retorna http 204: ok
+        if(result) res.status(204).end()
+
+        //Não encontrou (e não atualizou) ~> retonna HTTP 404: NOt Found
+        else res.status(404).end()
+    }
+    catch(error){
+        //deu errado: exibe o erro no console do back-end
+        console.error(error)
+        //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
+        res.status(500).send(error)
+        }
+}
+
 export default controller
