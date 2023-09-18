@@ -21,5 +21,14 @@ app.use("/users", usersRouter);
 import cursoRoute from './routes/curso.js'
 app.use('/curso', cursoRoute)
 
+import professorRoute from './routes/professor.js'
+app.use('/professor', professorRoute)
+
+import alunoRoute from './routes/aluno.js'
+app.use('/aluno', alunoRoute)
+
+import turmaRoute from './routes/turma.js'
+app.use('/turma', turmaRoute)
+
 
 export default app;
