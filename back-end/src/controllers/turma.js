@@ -21,9 +21,23 @@ controller.create = async  function(req, res){
 
 controller.retrieveAll = async function(req, res){
     try {
+
+        // por padrão, não inclui nenhum relacionamento
+        let include = {}
+        if(req.query.professor)     include.professor = true
+        if(req.query.curso)         include.curso = true
+        if(req.query.alunos)        include.alunos = true
+
+c
         //Manda buscar os dados no servidor
-        // Traz ordenado por nome, depois por n ivel
         const result = await prisma.turma.findMany({
+            
+
+            // Traz as informações das coleções relacionadas
+            include:{
+                professor: true,
+                curso: true
+            },
             orderBy:[
                 {cursoId:'asc'}, // ordem ascendete
             ]
