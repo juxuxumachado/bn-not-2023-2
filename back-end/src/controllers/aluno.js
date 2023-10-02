@@ -5,6 +5,7 @@ const controller ={} // objeto vazio
 
 controller.create = async  function(req, res){
     try{
+
      //conecta-se ao bd e envia uma instrução de criaçao de um novo documento, com os dados que estão dentro do req.body
         await prisma.aluno.create({data: req.body})
 
@@ -20,10 +21,17 @@ controller.create = async  function(req, res){
 }
 
 controller.retrieveAll = async function(req, res){
+
+        //Por padrão não inclui nenhum relacionamento
+    const include = {}
+
+        if(req.query.turmas) include.turmas = true
+    
     try {
         //Manda buscar os dados no servidor
         // Traz ordenado por nome, depois por n ivel
         const result = await prisma.aluno.findMany({
+            include,
             orderBy:[
                 {nome:'asc'}, // ordem ascendete
             ]
@@ -101,6 +109,36 @@ controller.delete = async function(req, res){
         //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
         res.status(500).send(error)
         }
+}
+
+controller.addTurma = async function(req, res){
+    try{
+        //Busca o aluno para recuperar a lista de ids de tumas dele
+        const aluno = await prisma.aluno.findUnique({
+            where:{id: req.params.alunoId}
+            
+        })
+        //Se ele não tiver turmas ainda, criamos a lista vazia
+        const turmaIds = aluno.turmaIds || []
+
+        //Se o id de turma passao ainda não estiver na lista do aluno, fazemos a respectiva inserção
+        if(! turmaIds.include(req.params.turmaId))
+        turmaIds.push(req.params.turmaId)
+
+        //Atualizamos o aluno com uma ista de ids de turma atualizadas
+        const result = await prisma.aluno.update({
+            where:{id: req.params.alunoId},
+            data: {turmaIds}
+        })
+
+    }
+    catch(error){
+        //deu errado: exibe o erro no console do back-end
+        console.error(error)
+        //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
+        res.status(500).send(error)
+
+    }
 }
 
 export default controller
