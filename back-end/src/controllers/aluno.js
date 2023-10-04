@@ -122,7 +122,7 @@ controller.addTurma = async function(req, res){
         const turmaIds = aluno.turmaIds || []
 
         //Se o id de turma passao ainda não estiver na lista do aluno, fazemos a respectiva inserção
-        if(! turmaIds.include(req.params.turmaId))
+        if(! turmaIds.includes(req.params.turmaId))
         turmaIds.push(req.params.turmaId)
 
         //Atualizamos o aluno com uma ista de ids de turma atualizadas
@@ -130,6 +130,57 @@ controller.addTurma = async function(req, res){
             where:{id: req.params.alunoId},
             data: {turmaIds}
         })
+
+        //Encontrou e atualizou ~> retona htto 204: NO CONTENT
+        if(result) res.status(204).end()
+        //Não encontrou (e não atualiou) retona http 404: NOT FOUND
+    else res.status(404).end()
+
+    }
+    catch(error){
+        //deu errado: exibe o erro no console do back-end
+        console.error(error)
+        //Envia o erro ao front-end, com status 500 - http 500: Internal Server Error
+        res.status(500).send(error)
+
+    }
+}
+
+controller.removeTurma = async function(req, res){
+    try{
+
+        //Busca o aluno para recuperar a lista de ids de turmas dele
+        const aluno = await prisma.aluno.findUnique({
+            where:{id: req.params.alunoId}
+        })
+
+        //Não encontrou o aluno, ou o aluno não tem turmas
+        //associadas a ele ~> HTTO 404: Not found
+        if(! aluno || ! aluno.turmaIds) res.send(404).end()
+
+
+        //Procura, na lista de ids de turma do aluno, se existe o id de turma passada para remoção
+        for(let i = 0; i < aluno.turmaIds.length; i++){
+            //Encontrou
+            if(aluno.turmaIds[i]===req.params.turmaId){
+                //Remove o id que foi passa da lista de ids de turma
+                aluno.turmaIds.splice(i,1)
+
+                //Faz a atualiza no aluno, alterando o conteudo de turmasId
+                const result = await prisma.aluno.update({
+                    where: {id: req.params.alunoId},
+                    data: {turmaIds: aluno.turmaIds}
+                })
+
+                // Encontrou e atualizou ~> retorna HTTP 204: No content
+        if(result) return res.status(204).end()
+        // Não encontrou (e não atualizou) ~> retorna HTTP 404: Not found
+        else return res.status(404).end()
+            }
+        }
+        // Se chegou até aqui, é porque não existe o id da turma passado
+         // na lista de ids de turma do aluno ~> HTTP 404: Not found
+        return res.status(404).end()  
 
     }
     catch(error){
